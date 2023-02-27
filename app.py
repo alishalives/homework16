@@ -1,5 +1,5 @@
 import json
-
+from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
@@ -20,8 +20,6 @@ class User(db.Model):
     email = db.Column(db.String(30))
     role = db.Column(db.String(30))
     phone = db.Column(db.String(30))
-    # orders = relationship("Order", back_populates="user_orders")
-    # offers = relationship("Offer", back_populates="user_offers")
 
 
 # Создание таблицы Order
@@ -30,14 +28,12 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20))
     description = db.Column(db.String(100))
-    start_date = db.Column(db.String(15))
-    end_date = db.Column(db.String(15))
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
     address = db.Column(db.String(50))
     price = db.Column(db.Integer)
     customer_id = db.Column(db.Integer, db.ForeignKey("user.id"))  # Внешний ключ тб User
     executor_id = db.Column(db.Integer, db.ForeignKey("user.id"))  # Внешний ключ тб User
-    # user_orders = relationship("User", back_populates="orders")
-    # offer_orders = relationship("Offer", back_populates="orders_offer")
 
 
 # Создание таблицы Offer
@@ -46,8 +42,6 @@ class Offer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey("order.id"))  # Внешний ключ тб Order
     executor_id = db.Column(db.Integer, db.ForeignKey("user.id"))  # Внешний ключ тб User
-    # orders_offers = relationship("Order", back_populates="offer_orders")
-    # user_offers = relationship("User", back_populates="offers")
 
 
 def load_from_json(json_file):
@@ -84,12 +78,10 @@ with app.app_context():
             id=order["id"],
             name=order["name"],
             description=order["description"],
-            start_date=order["start_date"],
-            end_date=order["end_date"],
+            start_date=datetime.strptime(order["start_date"], '%m/%d/%Y'),
+            end_date=datetime.strptime(order["end_date"], '%m/%d/%Y'),
             address=order["address"],
             price=order["price"],
-            # customer_id=User,
-            # executor_id=User
             customer_id=order["customer_id"],
             executor_id=order["executor_id"]
         )
@@ -100,8 +92,6 @@ with app.app_context():
     for offer in offers_json:
         db.session.add(Offer(
             id=offer["id"],
-            # order_id=Order,
-            # executor_id=Order
             order_id=offer["order_id"],
             executor_id=offer["executor_id"]
         )
