@@ -20,6 +20,8 @@ class User(db.Model):
     email = db.Column(db.String(30))
     role = db.Column(db.String(30))
     phone = db.Column(db.String(30))
+    # orders = relationship("Order", back_populates="user_orders")
+    # offers = relationship("Offer", back_populates="user_offers")
 
 
 # Создание таблицы Order
@@ -34,6 +36,8 @@ class Order(db.Model):
     price = db.Column(db.Integer)
     customer_id = db.Column(db.Integer, db.ForeignKey("user.id"))  # Внешний ключ тб User
     executor_id = db.Column(db.Integer, db.ForeignKey("user.id"))  # Внешний ключ тб User
+    # user_orders = relationship("User", back_populates="orders")
+    # offer_orders = relationship("Offer", back_populates="orders_offer")
 
 
 # Создание таблицы Offer
@@ -42,6 +46,8 @@ class Offer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey("order.id"))  # Внешний ключ тб Order
     executor_id = db.Column(db.Integer, db.ForeignKey("user.id"))  # Внешний ключ тб User
+    # orders_offers = relationship("Order", back_populates="offer_orders")
+    # user_offers = relationship("User", back_populates="offers")
 
 
 def load_from_json(json_file):
